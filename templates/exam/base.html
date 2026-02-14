@@ -4,9 +4,66 @@
     <title>Exam System</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100">
-    <div class="max-w-5xl mx-auto py-10">
-        {% block content %}{% endblock %}
+
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <!-- ================= NAVBAR ================= -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            
+            <!-- Logo -->
+            <h1 class="text-xl font-bold text-indigo-600">
+                OnlineExam
+            </h1>
+
+            <!-- Nav Links -->
+            <div class="space-x-6 text-gray-600 font-medium">
+                <a href="{% url 'core:teacher_dashboard' %}" class="hover:text-indigo-600 transition">Dashboard</a>
+                <a href="#" class="hover:text-indigo-600 transition">Exams</a>
+                <a href="#" class="hover:text-indigo-600 transition">Results</a>
+                <a href="{% url 'accounts:profile' %}" class="hover:text-indigo-600 transition">Profile</a>
+                <a href="#" class="hover:text-red-500 transition">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ================= BUTTON SECTION ================= -->
+    <div class="bg-gray-600 border-b">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-wrap gap-3">
+
+            <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                Create Exam
+            </button>
+
+            <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                View Exams
+            </button>
+
+            <button class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition">
+                Manage Students
+            </button>
+
+            <button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+                Reports
+            </button>
+            
+
+        </div>
     </div>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="flex-grow">
+        <div class="max-w-5xl mx-auto py-10 px-6">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="bg-white border-t mt-10">
+        <div class="max-w-7xl mx-auto px-6 py-4 text-center text-gray-500 text-sm">
+            © 2026 OnlineExam System | Developed by Viveek
+        </div>
+    </footer>
+
 </body>
 </html>

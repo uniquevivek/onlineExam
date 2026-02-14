@@ -111,3 +111,81 @@ def question_delete(request, pk):
 
     return redirect('question_list', exam_id=exam_id)
 
+
+from .forms import StudentGroupForm, ExamScheduleForm
+from .models import StudentGroup, ExamSchedule
+
+
+@login_required
+def group_create(request):
+    if request.method == "POST":
+        form = StudentGroupForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("exam:group_list")
+    else:
+        form = StudentGroupForm()
+
+    return render(request, "exam/group_create.html", {"form": form})
+
+@login_required
+def group_list(request):
+    groups = StudentGroup.objects.all()
+    return render(request, "exam/group_list.html", {"groups": groups})
+
+@login_required
+def schedule_create(request):
+    if request.method == "POST":
+        form = ExamScheduleForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("exam:schedule_list")
+    else:
+        form = ExamScheduleForm()
+
+    return render(request, "exam/schedule_create.html", {"form": form})
+
+@login_required
+def schedule_list(request):
+    schedules = ExamSchedule.objects.filter(is_cancelled=False)
+    return render(request, "exam/schedule_list.html", {"schedules": schedules})
+
+
+from django.shortcuts import get_object_or_404
+from django.contrib import messages
+
+
+@login_required
+def schedule_cancel(request, pk):
+    schedule = get_object_or_404(ExamSchedule, pk=pk)
+
+    if request.method == "POST":
+        schedule.is_cancelled = True
+        schedule.save()
+        messages.success(request, "Exam schedule cancelled successfully.")
+        return redirect("exam:schedule_list")
+
+    return render(request, "exam/schedule_cancel.html", {"schedule": schedule})
+
+
+@login_required
+def schedule_reschedule(request, pk):
+    schedule = get_object_or_404(ExamSchedule, pk=pk)
+
+    if schedule.is_cancelled:
+        messages.error(request, "Cannot reschedule a cancelled exam.")
+        return redirect("exam:schedule_list")
+
+    if request.method == "POST":
+        form = ExamScheduleForm(request.POST, instance=schedule)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Exam rescheduled successfully.")
+            return redirect("exam:schedule_list")
+    else:
+        form = ExamScheduleForm(instance=schedule)
+
+    return render(request, "exam/schedule_reschedule.html", {
+        "form": form,
+        "schedule": schedule
+    })
