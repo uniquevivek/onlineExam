@@ -18,7 +18,7 @@ def exam_create(request):
             exam = form.save(commit=False)
             exam.created_by = request.user
             exam.save()
-            return redirect('exam_list')
+            return redirect('exam:exam_list')
     else:
         form = ExamForm()
     return render(request, 'exam/exam_form.html', {'form': form})
@@ -30,7 +30,7 @@ def exam_update(request, pk):
     form = ExamForm(request.POST or None, instance=exam)
     if form.is_valid():
         form.save()
-        return redirect('exam_list')
+        return redirect('exam:exam_list')
     return render(request, 'exam/exam_form.html', {'form': form})
 
 
@@ -39,7 +39,7 @@ def exam_delete(request, pk):
     exam = get_object_or_404(Exam, pk=pk, created_by=request.user)
     if request.method == 'POST':
         exam.delete()
-        return redirect('exam_list')
+        return redirect('exam:exam_list')
     return render(request, 'exam/exam_confirm_delete.html', {'exam': exam})
 
 
@@ -73,7 +73,7 @@ def question_update(request, pk):
         form = QuestionForm(request.POST, instance=question)
         if form.is_valid():
             form.save()
-            return redirect('question_list', exam_id=question.exam.id)
+            return redirect('exam:uestion_list', exam_id=question.exam.id)
     else:
         form = QuestionForm(instance=question)
 
@@ -107,9 +107,9 @@ def question_delete(request, pk):
 
     if request.method == 'POST':
         question.delete()
-        return redirect('question_list', exam_id=exam_id)
+        return redirect('exam:question_list', exam_id=exam_id)
 
-    return redirect('question_list', exam_id=exam_id)
+    return redirect('exam:question_list', exam_id=exam_id)
 
 
 from .forms import StudentGroupForm, ExamScheduleForm

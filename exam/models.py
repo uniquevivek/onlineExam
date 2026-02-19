@@ -98,3 +98,36 @@ class ExamSchedule(models.Model):
 
     def __str__(self):
         return f"{self.exam} - {self.group} - {self.date}"
+
+
+class ExamAttempt(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    schedule = models.ForeignKey(ExamSchedule, on_delete=models.CASCADE)
+
+    start_time = models.DateTimeField(auto_now_add=True)
+    submitted_at = models.DateTimeField(null=True, blank=True)
+
+    is_submitted = models.BooleanField(default=False)
+    score = models.IntegerField(default=0)  
+
+    class Meta:
+        unique_together = ('student', 'schedule')
+
+    def __str__(self):
+        return f"{self.student} - {self.schedule}"
+
+
+class StudentAnswer(models.Model):
+    attempt = models.ForeignKey(ExamAttempt, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+
+    selected_option = models.CharField(
+        max_length=1,
+        choices=Question.OPTION_CHOICES
+    )
+
+    class Meta:
+        unique_together = ('attempt', 'question')
+
+    def __str__(self):
+        return f"{self.attempt.student} - {self.question}"
