@@ -65,10 +65,16 @@ def student_dashboard(request):
         if exam["schedule"].date == now.date()
         and exam["status"] in ["Upcoming", "Instructions", "Live"]
     ]
+    results = ExamAttempt.objects.filter(
+    student=user,
+    is_submitted=True
+    ).select_related("schedule__exam").order_by("-submitted_at")
+
 
     context = {
         "exam_list": exam_list,
         "today_exams": today_exams,
+        "results": results,
     }
 
     return render(request, "student//student_dashboard.html", context)
@@ -121,24 +127,24 @@ def start_exam(request, schedule_id):
         "questions": questions
     })
 
-from django.utils import timezone
+# from django.utils import timezone
 
 
-def submit_exam(request, schedule_id):
-    schedule = get_object_or_404(ExamSchedule, id=schedule_id)
+# def submit_exam(request, schedule_id):
+#     schedule = get_object_or_404(ExamSchedule, id=schedule_id)
 
-    attempt = get_object_or_404(
-        ExamAttempt,
-        student=request.user,
-        schedule=schedule
-    )
+#     attempt = get_object_or_404(
+#         ExamAttempt,
+#         student=request.user,
+#         schedule=schedule
+#     )
 
-    if not attempt.is_submitted:
-        attempt.is_submitted = True
-        attempt.submitted_at = timezone.now()
-        attempt.save()
+#     if not attempt.is_submitted:
+#         attempt.is_submitted = True
+#         attempt.submitted_at = timezone.now()
+#         attempt.save()
 
-    return redirect("core:student_dashboard")
+#     return redirect("core:student_dashboard")
 
 from django.http import JsonResponse
 from exam.models import StudentAnswer, ExamAttempt, ExamSchedule, Question

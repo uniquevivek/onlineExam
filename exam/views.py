@@ -1,15 +1,21 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from accounts.decorators import teacher_required
 from .models import Exam, Question
 from .forms import ExamForm, QuestionForm
 
 
+@teacher_required
 @login_required
 def exam_list(request):
     exams = Exam.objects.filter(created_by=request.user)
     return render(request, 'exam/exam_list.html', {'exams': exams})
 
+def exam_list(request):
+    exams = Exam.objects.filter(created_by=request.user)
+    return render(request, 'exam/exam_list.html', {'exams': exams})
 
+@teacher_required
 @login_required
 def exam_create(request):
     if request.method == 'POST':
@@ -23,7 +29,7 @@ def exam_create(request):
         form = ExamForm()
     return render(request, 'exam/exam_form.html', {'form': form})
 
-
+@teacher_required
 @login_required
 def exam_update(request, pk):
     exam = get_object_or_404(Exam, pk=pk, created_by=request.user)
@@ -33,7 +39,7 @@ def exam_update(request, pk):
         return redirect('exam:exam_list')
     return render(request, 'exam/exam_form.html', {'form': form})
 
-
+@teacher_required
 @login_required
 def exam_delete(request, pk):
     exam = get_object_or_404(Exam, pk=pk, created_by=request.user)
@@ -42,7 +48,7 @@ def exam_delete(request, pk):
         return redirect('exam:exam_list')
     return render(request, 'exam/exam_confirm_delete.html', {'exam': exam})
 
-
+@teacher_required
 @login_required
 def question_add(request, exam_id):
     exam = get_object_or_404(Exam, id=exam_id)
@@ -55,7 +61,7 @@ def question_add(request, exam_id):
         form = QuestionForm(initial={'exam': exam})
     return render(request, 'exam/question_form.html', {'form': form, 'exam': exam})
 
-
+@teacher_required
 @login_required
 def question_list(request, exam_id):
     exam = get_object_or_404(Exam, id=exam_id, created_by=request.user)
@@ -65,6 +71,7 @@ def question_list(request, exam_id):
         'questions': questions
     })
 
+@teacher_required
 @login_required
 def question_update(request, pk):
     question = get_object_or_404(Question, id=pk, exam__created_by=request.user)
@@ -189,3 +196,73 @@ def schedule_reschedule(request, pk):
         "form": form,
         "schedule": schedule
     })
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from exam.models import ExamSchedule, ExamAttempt
+
+
+@login_required
+def teacher_results(request, schedule_id):
+
+    schedule = get_object_or_404(ExamSchedule, id=schedule_id)
+
+    # 🔐 Security: Only exam creator (teacher) can view results
+    if request.user != schedule.exam.created_by:
+        raise PermissionDenied
+
+    attempts = ExamAttempt.objects.filter(
+        schedule=schedule,
+        is_submitted=True
+    ).select_related("student")
+
+    results_data = []
+
+    for attempt in attempts:
+        total_marks = schedule.exam.total_marks
+        percentage = (attempt.score / total_marks) * 100 if total_marks > 0 else 0
+
+        results_data.append({
+            "student": attempt.student,
+            "score": attempt.score,
+            "total_marks": total_marks,
+            "percentage": round(percentage, 2),
+            "submitted_at": attempt.submitted_at,
+        })
+
+    return render(request, "exam/teacher_results.html", {
+        "schedule": schedule,
+        "results_data": results_data
+    })
+
+@login_required
+def teacher_all_results(request):
+
+    schedules = ExamSchedule.objects.filter(
+        exam__created_by=request.user
+    ).select_related("exam")
+
+    return render(request, "exam/teacher_all_results.html", {
+        "schedules": schedules
+    })
+
+@login_required
+def teacher_results(request, schedule_id):
+
+    schedule = get_object_or_404(ExamSchedule, id=schedule_id)
+
+    if request.user != schedule.exam.created_by:
+        raise PermissionDenied
+
+    attempts = ExamAttempt.objects.filter(
+        schedule=schedule,
+        is_submitted=True
+    ).select_related("student")
+
+    return render(request, "exam/teacher_results.html", {
+        "schedule": schedule,
+        "attempts": attempts
+    })
+

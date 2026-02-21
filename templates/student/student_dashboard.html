@@ -104,7 +104,44 @@
                 <a href="{% url 'accounts:profile' %}" class="text-indigo-600 font-semibold hover:underline">
                     Go to Profile →
                 </a>
+
             </div>
+
+            <!-- Results Section -->
+            <div class="bg-white p-6 rounded-xl shadow mt-8">
+                <h3 class="font-semibold text-lg mb-4">My Results</h3>
+
+                {% if results %}
+                {% for attempt in results %}
+                <div class="border p-4 rounded flex justify-between items-center mb-3">
+
+                    <div>
+                        <p class="font-semibold">
+                            {{ attempt.schedule.exam.title }}
+                        </p>
+                        <p class="text-sm text-gray-500">
+                            {{ attempt.schedule.date }}
+                        </p>
+                    </div>
+
+                    <div class="flex items-center space-x-4">
+                        <span class="text-lg font-bold text-indigo-600">
+                            {{ attempt.score }} / {{ attempt.schedule.exam.total_marks }}
+                        </span>
+
+                        <a href="{% url 'student:result_view' attempt.schedule.id %}"
+                            class="text-indigo-600 font-semibold hover:underline">
+                            View →
+                        </a>
+                    </div>
+
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-gray-600">No results available yet.</p>
+                {% endif %}
+            </div>
+
 
         </div>
 

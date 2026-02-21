@@ -1,0 +1,39 @@
+{% extends "exam/base.html" %}
+{% block content %}
+
+<h2 class="text-2xl font-bold mb-6">
+    Results - {{ schedule.exam.title }}
+</h2>
+
+<table class="w-full bg-white shadow rounded">
+    <thead class="bg-gray-100">
+        <tr>
+            <th class="p-3 text-left">Student</th>
+            <th class="p-3 text-left">Score</th>
+            <th class="p-3 text-left">Total</th>
+            <th class="p-3 text-left">Submitted At</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for attempt in attempts %}
+        <tr class="border-t">
+            <td class="p-3">{{ attempt.student.username }}</td>
+            <td class="p-3 font-semibold text-indigo-600">
+                {{ attempt.score }}
+            </td>
+            <td class="p-3">{{ schedule.exam.total_marks }}</td>
+            <td class="p-3 text-gray-500">
+                {{ attempt.submitted_at }}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" class="p-4 text-center text-gray-500">
+                No students submitted yet.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

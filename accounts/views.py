@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import StudentRegisterForm, TeacherRegisterForm
 from django.contrib.auth.decorators import login_required
+from .decorators import teacher_required, student_required
 from .forms import (
     UserUpdateForm,
     StudentProfileForm,
@@ -38,6 +39,7 @@ def teacher_register(request):
 
 
 # ---------- STUDENT LOGIN ----------
+@student_required
 def student_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -55,6 +57,7 @@ def student_login(request):
 
 
 # ---------- TEACHER LOGIN ----------
+@teacher_required
 def teacher_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')

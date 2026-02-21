@@ -1,0 +1,49 @@
+{% extends "exam/base.html" %}
+{% block content %}
+
+<div class="max-w-5xl mx-auto p-6">
+
+    <h2 class="text-2xl font-bold mb-6">
+        Student Results
+    </h2>
+
+    <div class="bg-white shadow rounded overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="p-3 text-left">Exam</th>
+                    <th class="p-3 text-left">Date</th>
+                    <th class="p-3 text-left">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for schedule in schedules %}
+                <tr class="border-t">
+                    <td class="p-3">
+                        {{ schedule.exam.title }}
+                    </td>
+                    <td class="p-3">
+                        {{ schedule.date }}
+                    </td>
+                    <td class="p-3">
+                        <a href="{% url 'exam:teacher_results' schedule.id %}"
+                           class="text-indigo-600 hover:underline">
+                           View Results →
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="p-4 text-center text-gray-500">
+                        No scheduled exams found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

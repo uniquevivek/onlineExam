@@ -22,4 +22,8 @@ urlpatterns = [
     path("schedule/<int:pk>/cancel/", views.schedule_cancel, name="schedule_cancel"),
     path("schedule/<int:pk>/reschedule/", views.schedule_reschedule, name="schedule_reschedule"),
 
+    path("schedule/<int:schedule_id>/results/", views.teacher_results, name="teacher_results"),
+    path("teacher/results/", views.teacher_all_results, name="teacher_all_results"),
+
+
 ]
